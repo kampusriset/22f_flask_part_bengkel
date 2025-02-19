@@ -1,0 +1,131 @@
+<!-- =========================================
+     Search Results Page Template
+     Menampilkan hasil pencarian produk
+     ========================================= -->
+{% extends 'base.html' %}
+
+{% block title %}Hasil Pencarian: "{{ query }}"{% endblock %}
+
+{% block content %}
+<div class="container">
+    {# Header Section #}
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('home') }}" class="text-decoration-none text-dark me-3">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="mb-0">Hasil Pencarian: "{{ query }}"</h4>
+            <p class="text-muted mb-0">{{ products|length }} produk ditemukan</p>
+        </div>
+    </div>
+
+    {# Search Bar Section #}
+    <div class="mb-4">
+        <form action="{{ url_for('search') }}" method="GET">
+            <div class="input-group">
+                <input type="text" 
+                       class="form-control" 
+                       placeholder="Pencarian ..." 
+                       name="q"
+                       value="{{ query }}">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# Product Grid Section #}
+    <div class="row g-3">
+        {% for product in products %}
+        <div class="col-6">
+            <div class="product-card">
+                {# Product Image #}
+                <div class="product-image">
+                    {% if product.name == 'Paket Bore Up MX' %}
+                        <img src="{{ url_for('static', filename='images/products/bore-up-mx.png') }}" alt="{{ product.name }}">
+                    {% elif product.name == 'Paket Bore Up PCX 160' %}
+                        <img src="{{ url_for('static', filename='images/products/bore-up-pcx.png') }}" alt="{{ product.name }}">
+                    {% elif product.name == 'Busi NGK Iridium' %}
+                        <img src="{{ url_for('static', filename='images/products/busi-ngk.png') }}" alt="{{ product.name }}">
+                    {% elif product.name == 'Oli Motul 5100' %}
+                        <img src="{{ url_for('static', filename='images/products/oli-motul.png') }}" alt="{{ product.name }}">
+                    {% elif product.name == 'Shock YSS Twin' %}
+                        <img src="{{ url_for('static', filename='images/products/shock-yss.png') }}" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                    {% endif %}
+                </div>
+
+                {# Product Details #}
+                <div class="product-info">
+                    <h6 class="product-title">{{ product.name }}</h6>
+                    {% if product.discount_percentage > 0 %}
+                        <p class="product-price">
+                            <span class="original-price">Rp {{ "{:,.0f}".format(product.price) }}</span>
+                            <span class="discounted-price">Rp {{ "{:,.0f}".format(product.price * (100 - product.discount_percentage) / 100) }}</span>
+                            <span class="discount-badge">-{{ product.discount_percentage }}%</span>
+                        </p>
+                    {% else %}
+                        <p class="product-price">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                    {% endif %}
+                </div>
+
+                {# Action Button #}
+                <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">
+                    <i class="bi bi-cart-plus"></i> Checkout
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Empty State #}
+    {% if not products %}
+    <div class="text-center py-5">
+        <i class="bi bi-search" style="font-size: 3rem; color: var(--primary-color);"></i>
+        <h5 class="mt-3">Tidak ada produk yang ditemukan</h5>
+        <p class="text-muted">Coba kata kunci lain atau pilih kategori</p>
+    </div>
+    {% endif %}
+</div>
+
+{# Checkout Script #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle checkout button clicks
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            
+            // Send add to cart request
+            fetch('/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/cart';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

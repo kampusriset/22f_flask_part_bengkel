@@ -1,0 +1,201 @@
+<!-- =========================================
+     Home Page Template
+     Menampilkan halaman utama dengan kategori dan produk
+     ========================================= -->
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Search Bar Section -->
+    <div class="search-bar mb-4">
+        <form action="{{ url_for('search') }}" method="GET">
+            <div class="input-group">
+                <input type="text" 
+                       name="q" 
+                       class="form-control" 
+                       placeholder="Pencarian ..."
+                       aria-label="Search">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Promo Banner Section -->
+    <div id="promoCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2"></button>
+        </div>
+        
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="banner-content">
+                    <div class="banner-text">
+                        <h5 class="text-warning mb-2">DISKON</h5>
+                        <h2 class="display-6 text-white mb-2">UPTO 60% OFF</h2>
+                        <p class="text-white mb-0">Busi NGK Motor</p>
+                    </div>
+                    <div class="banner-image">
+                        <img src="{{ url_for('static', filename='images/promo/promo1.png') }}" alt="Busi NGK">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="carousel-item">
+                <div class="banner-content">
+                    <div class="banner-text">
+                        <h5 class="text-warning mb-2">PROMO SPESIAL</h5>
+                        <h2 class="display-6 text-white mb-2">Shock Breaker Day</h2>
+                        <p class="text-white mb-0">Diskon 40% untuk Shock Breaker</p>
+                    </div>
+                    <div class="banner-image">
+                        <img src="{{ url_for('static', filename='images/promo/promo2.png') }}" alt="Shock Breaker">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+
+    <!-- Category Section -->
+    <div class="mb-4">
+        <h5 class="mb-3">Kategori</h5>
+        <div class="category-section">
+            <div class="row row-cols-5 g-3">
+                {% for category in categories %}
+                <div class="col text-center">
+                    <a href="{{ url_for('category', id=category.id) }}" class="text-decoration-none">
+                        <div class="card category-card">
+                            <div class="card-body">
+                                {% if category.name == 'All' %}
+                                <div class="category-icon all-icon">
+                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                                        <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                                        <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                                        <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                {% else %}
+                                <img src="{{ category.icon_url }}" alt="{{ category.name }}" class="category-icon">
+                                {% endif %}
+                                <p class="mb-0 text-muted">{{ category.name }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Section -->
+    <div class="product-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Produk terbaru</h5>
+        </div>
+        <div class="row g-3">
+            {% for product in products %}
+            <div class="col-6">
+                <div class="product-card">
+                    <div class="card h-100">
+                        <a href="{{ url_for('product_detail', id=product.id) }}" class="text-decoration-none">
+                            <div class="product-image">
+                                {% if product.name == 'Paket Bore Up MX' %}
+                                <img src="{{ url_for('static', filename='images/products/bore-up-mx.png') }}" alt="{{ product.name }}">
+                                {% elif product.name == 'Paket Bore Up PCX 160' %}
+                                <img src="{{ url_for('static', filename='images/products/bore-up-pcx.png') }}" alt="{{ product.name }}">
+                                {% elif product.name == 'Busi NGK Iridium' %}
+                                <img src="{{ url_for('static', filename='images/products/busi-ngk.png') }}" alt="{{ product.name }}">
+                                {% elif product.name == 'Oli Motul 5100' %}
+                                <img src="{{ url_for('static', filename='images/products/oli-motul.png') }}" alt="{{ product.name }}">
+                                {% elif product.name == 'Shock YSS Twin' %}
+                                <img src="{{ url_for('static', filename='images/products/shock-yss.png') }}" alt="{{ product.name }}">
+                                {% else %}
+                                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                                {% endif %}
+                            </div>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title text-dark">{{ product.name }}</h6>
+                            <p class="card-text mb-3">
+                                {% if product.discount_percentage > 0 %}
+                                <small class="text-decoration-line-through text-muted">
+                                    Rp {{ "{:,.0f}".format(product.price) }}
+                                </small>
+                                <br>
+                                <span class="text-danger">
+                                    Rp {{ "{:,.0f}".format(product.price * (100 - product.discount_percentage) / 100) }}
+                                </span>
+                                {% else %}
+                                <span class="text-dark">
+                                    Rp {{ "{:,.0f}".format(product.price) }}
+                                </span>
+                                {% endif %}
+                            </p>
+                            <button class="btn btn-primary mt-auto btn-sm rounded-pill add-to-cart"
+                                    data-product-id="{{ product.id }}">
+                                <i class="bi bi-cart-plus"></i> Checkout
+                            </button>
+                        </div>
+                        {% if product.discount_percentage > 0 %}
+                        <div class="discount-badge">
+                            -{{ product.discount_percentage }}%
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript untuk handle checkout -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            
+            fetch('/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/cart';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

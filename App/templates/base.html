@@ -1,0 +1,73 @@
+<!-- =========================================
+     Base Template
+     Menyediakan struktur dasar untuk semua halaman
+     ========================================= -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {# Meta Tags #}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Anugrah Racing Garage</title>
+    
+    {# CSS Dependencies #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {# Navigation Bar 
+       Hanya ditampilkan jika hide_navbar tidak diset #}
+    {% if not hide_navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            {# Logo dan Brand #}
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            </a>
+            
+            {# Navigation Links #}
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('home') }}" class="text-white text-decoration-none me-4">
+                    <i class="bi bi-house-door"></i> Home
+                </a>
+                <a href="{{ url_for('cart') }}" class="text-white text-decoration-none me-4">
+                    <i class="bi bi-cart"></i> Keranjang
+                </a>
+                <a href="{{ url_for('order_history') }}" class="text-white text-decoration-none me-4">
+                    <i class="bi bi-clock-history"></i> Riwayat
+                </a>
+                <a href="{{ url_for('logout') }}" class="text-white text-decoration-none">
+                    <i class="bi bi-box-arrow-right"></i> Keluar
+                </a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    {# Flash Messages 
+       Menampilkan pesan sukses/error #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="container">
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {# Main Content Block #}
+    {% block content %}{% endblock %}
+
+    {# JavaScript Dependencies #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {# Custom JavaScript Block #}
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Riwayat Pesanan{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header dengan Back Button -->
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('home') }}" class="text-decoration-none text-dark me-3">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h4 class="mb-0">Riwayat Pesanan</h4>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs mb-4">
+        <div class="d-flex">
+            <a href="{{ url_for('order_history', filter='all') }}" 
+               class="btn {% if active_filter == 'all' %}btn-success{% else %}btn-outline-secondary{% endif %} me-2">
+                ALL
+            </a>
+            <a href="{{ url_for('order_history', filter='today') }}"
+               class="btn {% if active_filter == 'today' %}btn-success{% else %}btn-outline-secondary{% endif %} me-2">
+                Hari Ini
+            </a>
+            <a href="{{ url_for('order_history', filter='week') }}"
+               class="btn {% if active_filter == 'week' %}btn-success{% else %}btn-outline-secondary{% endif %} me-2">
+                Minggu Ini
+            </a>
+            <a href="{{ url_for('order_history', filter='month') }}"
+               class="btn {% if active_filter == 'month' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                Bulan Ini
+            </a>
+        </div>
+    </div>
+
+    <!-- Debug info -->
+    {% if orders %}
+        <p class="text-muted mb-3">Total orders: {{ orders|length }}</p>
+    {% endif %}
+
+    <!-- Daftar Pesanan -->
+    {% if orders %}
+        {% for order in orders %}
+        <div class="card mb-3 order-card">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted d-none">#{{ order.id }}</span>
+                        <span class="text-muted">{{ order.order_date }}</span>
+                    </div>
+                    <span class="badge {% if order.payment_status == 'paid' %}bg-success
+                                     {% elif order.payment_status == 'pending' %}bg-warning
+                                     {% else %}bg-danger{% endif %}">
+                        {{ order.status_label }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-start">
+                    <div class="order-image me-3">
+                        {% if order.preview_name == 'Paket Bore Up MX' %}
+                            <img src="{{ url_for('static', filename='images/products/bore-up-mx.png') }}" alt="Product">
+                        {% elif order.preview_name == 'Paket Bore Up PCX 160' %}
+                            <img src="{{ url_for('static', filename='images/products/bore-up-pcx.png') }}" alt="Product">
+                        {% elif order.preview_name == 'Busi NGK Iridium' %}
+                            <img src="{{ url_for('static', filename='images/products/busi-ngk.png') }}" alt="Product">
+                        {% elif order.preview_name == 'Oli Motul 5100' %}
+                            <img src="{{ url_for('static', filename='images/products/oli-motul.png') }}" alt="Product">
+                        {% elif order.preview_name == 'Shock YSS Twin' %}
+                            <img src="{{ url_for('static', filename='images/products/shock-yss.png') }}" alt="Product">
+                        {% else %}
+                            <img src="{{ order.preview_image }}" alt="Product">
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ order.preview_name }}</h6>
+                        {% if order.other_items %}
+                        <small class="text-muted d-block">+{{ order.other_items }} produk lainnya</small>
+                        {% endif %}
+                        <small class="text-muted d-block">Total {{ order.total_quantity }} item</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-primary fw-bold mb-2">
+                            Rp {{ "{:,.0f}".format(order.final_amount) }}
+                        </div>
+                        <a href="{{ url_for('order_success', order_id=order.id) }}" 
+                           class="btn btn-sm btn-outline-primary rounded-pill">
+                            Lihat Detail
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--primary-color);"></i>
+            <h5 class="mt-3">Belum Ada Pesanan</h5>
+            <p class="text-muted">Anda belum memiliki riwayat pemesanan</p>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">
+                Mulai Belanja
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

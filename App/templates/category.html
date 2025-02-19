@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header dengan lokasi -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active">{{ category.name }}</li>
+                </ol>
+            </nav>
+            <h4 class="mb-0">{{ category.name }}</h4>
+            <p class="text-muted mb-0">{{ products|length }} produk ditemukan</p>
+        </div>
+        <div>
+            <a href="{{ url_for('cart') }}" class="btn btn-link">
+                <i class="bi bi-cart"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search bar -->
+    <div class="mb-4">
+        <form action="{{ url_for('search') }}" method="GET">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Pencarian ..." name="q">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Kategori -->
+    <div class="row row-cols-5 g-3 mb-4">
+        {% for cat in categories %}
+        <div class="col text-center">
+            <a href="{{ url_for('category', id=cat.id) }}" class="text-decoration-none">
+                <div class="card category-card {% if cat.id == category.id %}active{% endif %}">
+                    <div class="card-body">
+                        {% if cat.name == 'All' %}
+                        <div class="category-icon all-icon">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        {% else %}
+                        <img src="{{ cat.icon_url }}" alt="{{ cat.name }}" class="category-icon">
+                        {% endif %}
+                        <p class="mb-0 text-muted">{{ cat.name }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Product Section -->
+    <div class="product-section">
+        <div class="row g-3">
+            {% for product in products %}
+            <div class="col-6">
+                <div class="product-card">
+                    <div class="card h-100">
+                        <a href="{{ url_for('product_detail', id=product.id) }}" class="text-decoration-none">
+                            <div class="product-image">
+                                {% if product.name == 'Paket Bore Up MX' %}
+                                <img src="{{ url_for('static', filename='images/products/bore-up-mx.png') }}" class="card-img-top" alt="{{ product.name }}">
+                                {% elif product.name == 'Paket Bore Up PCX 160' %}
+                                <img src="{{ url_for('static', filename='images/products/bore-up-pcx.png') }}" class="card-img-top" alt="{{ product.name }}">
+                                {% elif product.name == 'Busi NGK Iridium' %}
+                                <img src="{{ url_for('static', filename='images/products/busi-ngk.png') }}" class="card-img-top" alt="{{ product.name }}">
+                                {% elif product.name == 'Oli Motul 5100' %}
+                                <img src="{{ url_for('static', filename='images/products/oli-motul.png') }}" class="card-img-top" alt="{{ product.name }}">
+                                {% elif product.name == 'Shock YSS Twin' %}
+                                <img src="{{ url_for('static', filename='images/products/shock-yss.png') }}" class="card-img-top" alt="{{ product.name }}">
+                                {% else %}
+                                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                                {% endif %}
+                            </div>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title text-dark">{{ product.name }}</h6>
+                            <p class="card-text mb-3">
+                                {% if product.discount_percentage > 0 %}
+                                <small class="text-decoration-line-through text-muted">
+                                    Rp {{ "{:,.0f}".format(product.price) }}
+                                </small>
+                                <br>
+                                <span class="text-danger">
+                                    Rp {{ "{:,.0f}".format(product.price * (100 - product.discount_percentage) / 100) }}
+                                </span>
+                                {% else %}
+                                <span class="text-dark">
+                                    Rp {{ "{:,.0f}".format(product.price) }}
+                                </span>
+                                {% endif %}
+                            </p>
+                            <button class="btn btn-primary mt-auto btn-sm rounded-pill add-to-cart"
+                                    data-product-id="{{ product.id }}">
+                                <i class="bi bi-cart-plus"></i> Checkout
+                            </button>
+                        </div>
+                        {% if product.discount_percentage > 0 %}
+                        <div class="discount-badge">
+                            -{{ product.discount_percentage }}%
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if not products %}
+    <div class="text-center py-5">
+        <h5>Tidak ada produk dalam kategori ini</h5>
+        <p class="text-muted">Coba pilih kategori lain atau gunakan pencarian</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Script untuk handle checkout -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            
+            fetch('/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/cart';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

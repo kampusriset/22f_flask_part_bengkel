@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Pembayaran{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('cart') }}" class="text-decoration-none text-dark me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h4 class="mb-0">Pembayaran</h4>
+            </div>
+
+            <!-- Metode Pembayaran -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="mb-4">Metode Pembayaran</h5>
+                    
+                    <!-- COD -->
+                    <div class="payment-option mb-3">
+                        <input type="radio" class="btn-check" name="payment_method" id="cod" value="cod" checked>
+                        <label class="btn btn-outline-light w-100 text-start" for="cod">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">COD</h6>
+                                    <p class="text-muted small mb-0">Siapkan Uang Untuk Pembayaran</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Bank Transfer -->
+                    <div class="payment-option mb-3">
+                        <input type="radio" class="btn-check" name="payment_method" id="mandiri" value="mandiri">
+                        <label class="btn btn-outline-light w-100 text-start" for="mandiri">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">Bank Mandiri</h6>
+                                    <p class="text-muted small mb-0">•••• •••• •••• 8743</p>
+                                </div>
+                                <img src="{{ url_for('static', filename='images/payment/mandiri.png') }}" alt="Mandiri" height="30">
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="payment-option mb-3">
+                        <input type="radio" class="btn-check" name="payment_method" id="bca" value="bca">
+                        <label class="btn btn-outline-light w-100 text-start" for="bca">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">Bank BCA</h6>
+                                    <p class="text-muted small mb-0">•••• •••• •••• 4553</p>
+                                </div>
+                                <img src="{{ url_for('static', filename='images/payment/bca.png') }}" alt="BCA" height="30">
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- E-Wallets -->
+                    <h5 class="mb-3 mt-4">Wallets</h5>
+                    
+                    <div class="payment-option mb-3">
+                        <input type="radio" class="btn-check" name="payment_method" id="dana" value="dana">
+                        <label class="btn btn-outline-light w-100 text-start" for="dana">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">Dana</h6>
+                                    <p class="text-muted small mb-0">Bayar Mudah Dengan Dana</p>
+                                </div>
+                                <img src="{{ url_for('static', filename='images/payment/dana.png') }}" alt="Dana" height="30">
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="payment-option mb-3">
+                        <input type="radio" class="btn-check" name="payment_method" id="gopay" value="gopay">
+                        <label class="btn btn-outline-light w-100 text-start" for="gopay">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">Gopay</h6>
+                                    <p class="text-muted small mb-0">Transaksi Cepat Dan Praktis</p>
+                                </div>
+                                <img src="{{ url_for('static', filename='images/payment/gopay.png') }}" alt="Gopay" height="30">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alamat -->
+            <div class="mb-4">
+                <a href="{{ url_for('add_address') }}" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-plus-circle"></i> Tambahkan Alamat Anda
+                </a>
+            </div>
+
+            <!-- Tambahkan setelah bagian alamat dan sebelum tombol bayar -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="mb-4">Ringkasan Belanja</h5>
+                    
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-0">{{ item.name }}</h6>
+                            <small class="text-muted">{{ item.quantity }} x 
+                                {% if item.discount_percentage > 0 %}
+                                Rp {{ "{:,.0f}".format(item.discounted_price) }}
+                                {% else %}
+                                Rp {{ "{:,.0f}".format(item.price) }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <span>Rp {{ "{:,.0f}".format(item.quantity * (item.discounted_price if item.discount_percentage > 0 else item.price)) }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>Rp {{ "{:,.0f}".format(subtotal) }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Diskon</span>
+                        <span class="text-danger">-Rp {{ "{:,.0f}".format(total_discount) }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Ongkos Kirim</span>
+                        <span>Rp 0</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Total Bayar</span>
+                        <span class="fw-bold">Rp {{ "{:,.0f}".format(final_total) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Bayar -->
+            <button class="btn btn-primary w-100 py-3 rounded-pill" onclick="processPayment()">
+                Bayar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function processPayment() {
+    const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
+    if (!selectedPayment) {
+        alert('Pilih metode pembayaran');
+        return;
+    }
+
+    fetch('/process-payment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            payment_method: selectedPayment.value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            alert(data.message);
+        }
+    });
+}
+</script>
+{% endblock %} 
