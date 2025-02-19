@@ -13,6 +13,7 @@
 Video ini menjelaskan cara menggunakan aplikasi, fitur-fitur utamanya.
 
 ---
+## **FLOWCHART**
 ![flowchart](https://github.com/user-attachments/assets/d540b804-51a4-4c1e-8212-e741c14e8ee3)
 
 ## **Perkenalan Tim**
